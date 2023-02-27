@@ -1,0 +1,19 @@
+{
+    "name": "fabri19f/container",
+    "autoload": {
+        "psr-4": {
+            "Src\\": "src",
+            "Src\\Container\\": "src/Container",
+            "Src\\Container\\Exceptions\\": "src/Container/Exceptions"
+        }
+    },
+    "authors": [
+        {
+            "name": "fabri19f",
+            "email": "fabri19.fmd@gmail.com"
+        }
+    ],
+    "require": {
+        "psr/container": "^2.0"
+    }
+}

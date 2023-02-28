@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionFunction;
 use ReflectionMethod;
 use ReflectionParameter;
@@ -16,7 +17,7 @@ class Container implements ContainerInterface
 {
     /**
      * The container's instances (singletons).
-     * Las intancias del contenedor (singletons).
+     * Las instancias del contenedor (singletons).
      * 
      * @var array $instances
      */
@@ -100,13 +101,13 @@ class Container implements ContainerInterface
     /**
      * Build an instance of the given concrete class.
      * Construye una instancia de la clase concreta dada.
-     * 
+     *
      * @param string $concrete
      * @param array $arguments
-     * 
+     *
      * @return object
-     * 
-     * @throws \Src\Container\Exceptions\DependencyResolutionException
+     *
+     * @throws DependencyResolutionException|ReflectionException
      */
     public function build(string $concrete, array $arguments = []): object
     {
@@ -120,7 +121,7 @@ class Container implements ContainerInterface
         }
 
         $constructor = $reflectionClass->getConstructor();
-        $parameters = $constructor ? $constructor->getParameters() : null;
+        $parameters = $constructor?->getParameters();
 
         if (!$parameters) {
             array_pop($this->buildStack);
@@ -136,13 +137,14 @@ class Container implements ContainerInterface
     /**
      * Resolve the dependencies of a valid Callable.
      * Resuelve las dependencias de un Callable válido.
-     * 
+     *
      * @param Callable $callable
      * @param array $arguments
-     * 
+     *
      * @return mixed
-     * 
-     * @throws \Src\Container\Exceptions\DependencyResolutionException
+     *
+     *
+     * @throws DependencyResolutionException|ReflectionException
      */
     public function call(Callable $callable, array $arguments = []): mixed
     {
@@ -157,21 +159,21 @@ class Container implements ContainerInterface
 
     /**
      * Retrieve and recursively resolve the dependencies of a concrete class.
-     * Recupera y resuelve de forma recursiva las dependencias de una clase concreta. 
-     * 
+     * Recupera y resuelve de forma recursiva las dependencias de una clase concreta.
+     *
      * @param array $parameters
      * @param array $arguments
-     * 
+     *
      * @return array
-     * 
-     * @throws \Src\Container\Exceptions\DependencyResolutionException
+     *
+     * @throws DependencyResolutionException|ReflectionException
      */
     protected function getDependencies(array $parameters, array $arguments): array
     {
         $instances = [];
         foreach ($parameters as $parameter) {
             // If the parameter is a class, it is resolved recursively.
-            // Si el parametro es una clase, se resuelve de forma recursiva. 
+            // Si el parámetro es una clase, se resuelve de forma recursiva.
             if ($this->isNotBuiltin($parameter)) {
                 $instances[$parameter->getName()] = $this->resolve($parameter->getType()->getName());
             }
@@ -195,11 +197,11 @@ class Container implements ContainerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return mixed
      */
-    public function get(string $id)
+    public function get(string $id): mixed
     {
         try {
             return $this->resolve($id);
@@ -214,13 +216,13 @@ class Container implements ContainerInterface
     /**
      * Resolve the given abstraction.
      * Resuelve la abstracción dada.
-     * 
+     *
      * @param string $abstract
      * @param array $arguments
-     * 
+     *
      * @return object
-     * 
-     * @throws \Src\Container\Exceptions\DependencyResolutionException
+     *
+     * @throws DependencyResolutionException|ReflectionException
      */
     public function make(string $abstract, array $arguments = []): object
     {
@@ -236,20 +238,20 @@ class Container implements ContainerInterface
      * 
      * @return object
      * 
-     * @throws \Src\Container\Exceptions\DependencyResolutionException
+     * @throws DependencyResolutionException|ReflectionException
      */
     protected function resolve(string $abstract, array $arguments = []): object
     {
         // If a contextual binding is found, the implementation bound to that context is retrieved
         // and recursively resolved using the 'build' method.
-        // Si se encuenta un enlace contextual, la implementación vinculada a ese contexto es recuperada 
+        // Si se encuentra un enlace contextual, la implementación vinculada a ese contexto es recuperada
         // y resuelta de forma recursiva mediante el método 'build'.
         if ($implementation = $this->findContextualBinding($abstract)) {
             return $this->build($implementation);
         }
 
         // If a simple binding is found, the abstraction is resolved using the 'resolveBinding' method.
-        // Si se encuenta un enlace simple, la abstracción es resuelta mediante el método 'resolveBinding'.
+        // Si se encuentra un enlace simple, la abstracción es resuelta mediante el método 'resolveBinding'.
         if (isset($this->bindings[$abstract])) {
             return $this->resolveBinding($abstract, $arguments);
         }
@@ -269,8 +271,6 @@ class Container implements ContainerInterface
      * @param array $arguments
      * 
      * @return object
-     * 
-     * @throws \Src\Container\Exceptions\DependencyResolutionException
      */
     protected function resolveBinding(string $abstract, array $arguments): object
     {
@@ -290,10 +290,8 @@ class Container implements ContainerInterface
         // and add it to the container instances.
         // Se comprueba si ya existe una instancia en el contenedor que corresponda con la abstracción dada, si es asi, se retorna la misma instancia,
         // de lo contrario se llama al Closure vinculado al enlace para que resuelva la abstracción de forma recursiva  
-        // y se agrege a las intancias del contenedor. 
-        return isset($this->instances[$abstract])
-            ? $this->instances[$abstract]
-            : $this->instances[$abstract] = $concrete($arguments);
+        // y se añada a las instancias del contenedor.
+        return $this->instances[$abstract] ?? $this->instances[$abstract] = $concrete($arguments);
     }
 
     /**
@@ -310,7 +308,7 @@ class Container implements ContainerInterface
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @return bool
      */
@@ -325,7 +323,7 @@ class Container implements ContainerInterface
      * Define un enlace contextual.
      *
      * @param  string|array  $concrete
-     * @return \Src\Container\ContextualBindingBuilder
+     * @return ContextualBindingBuilder
      */
     public function when(string|array $concrete): ContextualBindingBuilder
     {

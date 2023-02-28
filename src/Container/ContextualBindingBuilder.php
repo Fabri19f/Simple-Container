@@ -8,7 +8,7 @@ class ContextualBindingBuilder
      * The underlying container instance.
      * La instancia del contenedor subyacente.
      *
-     * @var \Src\Container\Container
+     * @var Container
      */
     protected Container $container;
 
@@ -22,7 +22,7 @@ class ContextualBindingBuilder
 
     /**
      * The abstract target.
-     * La abstracción objetivo.
+     * El objetivo abstracto.
      *
      * @var string
      */
@@ -32,7 +32,7 @@ class ContextualBindingBuilder
      * Create a new contextual binding builder.
      * Crea un nuevo constructor de enlace contextual.
      *
-     * @param \Src\Container\Container $container
+     * @param Container $container
      * @param string|array $concrete
      * @return void
      */
@@ -48,7 +48,7 @@ class ContextualBindingBuilder
      *
      * @param string $abstract
      * 
-     * @return \Src\Container\ContextualBindingBuilder
+     * @return ContextualBindingBuilder
      */
     public function needs(string $abstract): ContextualBindingBuilder
     {
@@ -75,7 +75,7 @@ class ContextualBindingBuilder
      * Wrap the concrete value in an array if it is a string.
      * Envuelve el valor concreto en un arreglo si se trata de una cadena.
      * 
-     * @param string|array
+     * @param string|array $concrete
      * 
      * @return array
      */

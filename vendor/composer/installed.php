@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'fabri19f/container',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => NULL,
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => '95e3f63d478f8edf3353ebc1b5476addf2f06896',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'fabri19f/container' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => NULL,
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => '95e3f63d478f8edf3353ebc1b5476addf2f06896',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

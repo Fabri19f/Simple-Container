@@ -76,8 +76,8 @@ class Container implements ContainerInterface
         // por ello es necesario envolver al valor concreto en un Closure
         // para que este, al ser llamado resuelva la clase concreta de forma recursiva.
         if (!$concrete instanceof Closure) {
-            $concrete = function (array $arguments) use ($concrete): object {
-                return $this->build($concrete, $arguments);
+            $concrete = static function (Container $container, array $arguments) use ($concrete): object {
+                return $container->build($concrete, $arguments);
             };
         }
 
@@ -282,7 +282,7 @@ class Container implements ContainerInterface
         // If the binding is not a singleton, call the Closure linked to the binding to recursively resolve the abstraction.
         // Si el enlace no es un singleton, se llama al Closure vinculado al enlace para que resuelva la abstracción de forma recursiva.
         if (!$binding['singleton']) {
-            return $concrete($arguments);
+            return $concrete($this, $arguments);
         }
 
         // Check if there is already an instance in the container that corresponds to the given abstraction, if so, return the same instance,
@@ -291,7 +291,7 @@ class Container implements ContainerInterface
         // Se comprueba si ya existe una instancia en el contenedor que corresponda con la abstracción dada, si es asi, se retorna la misma instancia,
         // de lo contrario se llama al Closure vinculado al enlace para que resuelva la abstracción de forma recursiva  
         // y se añada a las instancias del contenedor.
-        return $this->instances[$abstract] ?? $this->instances[$abstract] = $concrete($arguments);
+        return $this->instances[$abstract] ?? $this->instances[$abstract] = $concrete($this, $arguments);
     }
 
     /**
